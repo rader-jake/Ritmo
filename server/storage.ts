@@ -1,38 +1,98 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { randomUUID } from "crypto";
+import { db } from "./db";
+import { goals, logs, type InsertGoal, type InsertLog, type UpdateGoalRequest, type UpdateLogRequest } from "@shared/schema";
+import { eq, and, desc, gte, lte } from "drizzle-orm";
+import { authStorage, type IAuthStorage } from "./replit_integrations/auth/storage";
 
-// modify the interface with any CRUD methods
-// you might need
+export interface IStorage extends IAuthStorage {
+  // Goals
+  getGoals(userId: string): Promise<typeof goals.$inferSelect[]>;
+  getGoal(id: number): Promise<typeof goals.$inferSelect | undefined>;
+  createGoal(goal: InsertGoal & { userId: string }): Promise<typeof goals.$inferSelect>;
+  updateGoal(id: number, updates: UpdateGoalRequest): Promise<typeof goals.$inferSelect>;
+  deleteGoal(id: number): Promise<void>;
 
-export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  // Logs
+  getLogs(goalId: number, from?: string, to?: string): Promise<typeof logs.$inferSelect[]>;
+  createLog(log: InsertLog): Promise<typeof logs.$inferSelect>;
+  updateLog(id: number, updates: UpdateLogRequest): Promise<typeof logs.$inferSelect>;
+  deleteLog(id: number): Promise<void>;
+  
+  // Upsert log helper (often used in these apps to overwrite day)
+  upsertLog(log: InsertLog): Promise<typeof logs.$inferSelect>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
+export class DatabaseStorage implements IStorage {
+  // Auth methods delegated to authStorage
+  getUser = authStorage.getUser;
+  upsertUser = authStorage.upsertUser;
 
-  constructor() {
-    this.users = new Map();
+  // Goals
+  async getGoals(userId: string) {
+    return await db.select().from(goals).where(and(eq(goals.userId, userId), eq(goals.archived, false))).orderBy(desc(goals.createdAt));
   }
 
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+  async getGoal(id: number) {
+    const [goal] = await db.select().from(goals).where(eq(goals.id, id));
+    return goal;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+  async createGoal(goal: InsertGoal & { userId: string }) {
+    const [newGoal] = await db.insert(goals).values(goal).returning();
+    return newGoal;
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async updateGoal(id: number, updates: UpdateGoalRequest) {
+    const [updated] = await db.update(goals).set(updates).where(eq(goals.id, id)).returning();
+    return updated;
+  }
+
+  async deleteGoal(id: number) {
+    // Soft delete usually preferred for goals, but API said delete. 
+    // Schema has 'archived', so maybe we just set archived?
+    // Let's actually delete for now to match the 'delete' route, or user can use update to archive.
+    await db.delete(goals).where(eq(goals.id, id));
+  }
+
+  // Logs
+  async getLogs(goalId: number, from?: string, to?: string) {
+    let query = db.select().from(logs).where(eq(logs.goalId, goalId));
+    
+    if (from) {
+      query = query.where(gte(logs.date, from)) as any;
+    }
+    if (to) {
+      query = query.where(lte(logs.date, to)) as any;
+    }
+    
+    return await query.orderBy(desc(logs.date));
+  }
+
+  async createLog(log: InsertLog) {
+    const [newLog] = await db.insert(logs).values(log).returning();
+    return newLog;
+  }
+
+  async updateLog(id: number, updates: UpdateLogRequest) {
+    const [updated] = await db.update(logs).set(updates).where(eq(logs.id, id)).returning();
+    return updated;
+  }
+
+  async deleteLog(id: number) {
+    await db.delete(logs).where(eq(logs.id, id));
+  }
+
+  async upsertLog(log: InsertLog) {
+    // Check if log exists for this goal and date
+    const [existing] = await db.select().from(logs).where(and(eq(logs.goalId, log.goalId), eq(logs.date, log.date)));
+    
+    if (existing) {
+      const [updated] = await db.update(logs).set(log).where(eq(logs.id, existing.id)).returning();
+      return updated;
+    } else {
+      const [newLog] = await db.insert(logs).values(log).returning();
+      return newLog;
+    }
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
