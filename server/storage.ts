@@ -28,7 +28,14 @@ export class DatabaseStorage implements IStorage {
 
   // Goals
   async getGoals(userId: string) {
-    return await db.select().from(goals).where(and(eq(goals.userId, userId), eq(goals.archived, false))).orderBy(desc(goals.createdAt));
+    const results = await db.query.goals.findMany({
+      where: and(eq(goals.userId, userId), eq(goals.archived, false)),
+      with: {
+        logs: true,
+      },
+      orderBy: [desc(goals.createdAt)],
+    });
+    return results;
   }
 
   async getGoal(id: number) {
@@ -55,16 +62,17 @@ export class DatabaseStorage implements IStorage {
 
   // Logs
   async getLogs(goalId: number, from?: string, to?: string) {
-    let query = db.select().from(logs).where(eq(logs.goalId, goalId));
+    let where = eq(logs.goalId, goalId);
     
-    if (from) {
-      query = query.where(gte(logs.date, from)) as any;
-    }
-    if (to) {
-      query = query.where(lte(logs.date, to)) as any;
+    if (from && to) {
+      return await db.select().from(logs).where(and(where, gte(logs.date, from), lte(logs.date, to))).orderBy(desc(logs.date));
+    } else if (from) {
+      return await db.select().from(logs).where(and(where, gte(logs.date, from))).orderBy(desc(logs.date));
+    } else if (to) {
+      return await db.select().from(logs).where(and(where, lte(logs.date, to))).orderBy(desc(logs.date));
     }
     
-    return await query.orderBy(desc(logs.date));
+    return await db.select().from(logs).where(where).orderBy(desc(logs.date));
   }
 
   async createLog(log: InsertLog) {

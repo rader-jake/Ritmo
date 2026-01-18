@@ -70,7 +70,7 @@ export default function Dashboard() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
             {goals.map((goal) => (
-              <GoalCard key={goal.id} goal={goal} />
+              <GoalCard key={goal.id} goal={goal as any} />
             ))}
           </div>
         )}
