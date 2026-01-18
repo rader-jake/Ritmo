@@ -10,9 +10,10 @@ interface HeatmapProps {
   startDate?: string | Date;
   endDate?: string | Date | null;
   className?: string;
+  interactive?: boolean;
 }
 
-export function Heatmap({ logs, startDate: customStartDate, endDate: customEndDate, className }: HeatmapProps) {
+export function Heatmap({ logs, startDate: customStartDate, endDate: customEndDate, className, interactive = true }: HeatmapProps) {
   const today = startOfToday();
   const startDate = useMemo(() => {
     if (customStartDate) {
@@ -97,23 +98,32 @@ export function Heatmap({ logs, startDate: customStartDate, endDate: customEndDa
             // weekIndex * 7 + dayIndex gives us the position in the chronological flow
             const globalIndex = weekIndex * 7 + dayIndex;
             
+            const content = (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ 
+                  delay: globalIndex * 0.008,
+                  duration: 0.15,
+                  ease: "easeOut"
+                }}
+                className={cn(
+                  "w-3 h-3 rounded-[3px] transition-all duration-300 cursor-default border border-black/[0.03]", 
+                  getColor(effort),
+                  effort > 0 && "shadow-[inset_0_-1px_0_rgba(0,0,0,0.1)]",
+                  interactive && effort > 0 && "hover:scale-110"
+                )} 
+              />
+            );
+
+            if (!interactive) {
+              return <div key={dateStr}>{content}</div>;
+            }
+            
             return (
               <Tooltip key={dateStr}>
                 <TooltipTrigger asChild>
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ 
-                      delay: globalIndex * 0.008, // Adjust this multiplier to control the speed (0.008 is slower than before)
-                      duration: 0.15,
-                      ease: "easeOut"
-                    }}
-                    className={cn(
-                      "w-3 h-3 rounded-[3px] transition-all duration-300 cursor-default border border-black/[0.03]", 
-                      getColor(effort),
-                      effort > 0 && "shadow-[inset_0_-1px_0_rgba(0,0,0,0.1)] hover:scale-110"
-                    )} 
-                  />
+                  {content}
                 </TooltipTrigger>
                 <TooltipContent 
                   side="top" 

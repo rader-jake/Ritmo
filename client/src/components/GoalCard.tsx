@@ -44,7 +44,7 @@ export function GoalCard({ goal }: GoalCardProps) {
         </div>
         
         <div className="relative mt-2">
-          <Heatmap logs={logs} startDate={goal.startDate} endDate={goal.endDate} className="mask-gradient-right" />
+          <Heatmap logs={logs} startDate={goal.startDate} endDate={goal.endDate} className="mask-gradient-right" interactive={false} />
         </div>
       </CardContent>
     </Card>
