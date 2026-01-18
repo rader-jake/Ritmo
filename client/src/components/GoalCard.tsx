@@ -16,18 +16,26 @@ export function GoalCard({ goal }: GoalCardProps) {
 
   return (
     <Card 
-      className="glass-card hover:shadow-md transition-all duration-300 cursor-pointer group active:scale-[0.99] overflow-hidden"
+      className="glass-card hover:shadow-xl hover:-translate-y-1 transition-all duration-500 cursor-pointer group active:scale-[0.98] overflow-hidden border-black/[0.02]"
       onClick={() => setLocation(`/goals/${goal.id}`)}
     >
-      <CardContent className="p-4 sm:p-5">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">
-            {goal.title}
-          </h3>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center text-xs font-medium text-muted-foreground gap-1 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100">
-              <Flame className="h-3 w-3 text-orange-500 fill-orange-500" />
-              <span className="text-orange-700">{totalActiveDays}</span>
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <CardContent className="p-5 sm:p-6 relative z-10">
+        <div className="flex items-start justify-between mb-6">
+          <div className="space-y-1">
+            <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors leading-none">
+              {goal.title}
+            </h3>
+            {goal.description && (
+              <p className="text-xs text-muted-foreground line-clamp-1 max-w-[200px]">
+                {goal.description}
+              </p>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center text-[10px] font-bold text-orange-600 gap-1 bg-orange-50 px-2 py-1 rounded-lg border border-orange-100/50 uppercase tracking-tighter">
+              <Flame className="h-3 w-3 fill-orange-500" />
+              <span>{totalActiveDays} Days</span>
             </div>
             <div onClick={(e) => e.stopPropagation()}>
               <EffortLogger goalId={goal.id} />
@@ -35,8 +43,8 @@ export function GoalCard({ goal }: GoalCardProps) {
           </div>
         </div>
         
-        <div className="relative">
-          <Heatmap logs={logs} startDate={goal.startDate} className="mask-gradient-right" />
+        <div className="relative mt-2">
+          <Heatmap logs={logs} startDate={goal.startDate} endDate={goal.endDate} className="mask-gradient-right" />
         </div>
       </CardContent>
     </Card>

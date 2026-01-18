@@ -48,12 +48,19 @@
   }
 
   .glass-card {
-    @apply bg-white rounded-2xl border border-black/5 shadow-sm;
+    @apply bg-white rounded-[24px] border border-black/[0.03] shadow-[0_2px_10px_-3px_rgba(0,0,0,0.07)] transition-all duration-300;
   }
 
-  .btn-primary {
-    @apply bg-[#0F766E] text-white hover:bg-[#0F766E]/90 shadow-md hover:shadow-lg transition-all active:scale-[0.98];
+  .mask-gradient-right {
+    mask-image: linear-gradient(to right, black 85%, transparent 100%);
   }
+}
+
+/* Custom Background for dashboard */
+.dashboard-bg {
+  background-color: #F7F7F7;
+  background-image: radial-gradient(#0F766E0F 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
 /* Custom scrollbar for horizontal scrolling containers */

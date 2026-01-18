@@ -30,7 +30,7 @@ export default function Dashboard() {
   const hasGoals = goals && goals.length > 0;
 
   return (
-    <div className="min-h-screen bg-[#F7F7F7] pb-20">
+    <div className="min-h-screen bg-[#F7F7F7] dashboard-bg pb-20">
       <header className="sticky top-0 z-10 border-b border-black/5 bg-white/80 backdrop-blur-md">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -48,13 +48,40 @@ export default function Dashboard() {
       </header>
 
       <main className="container mx-auto px-4 py-8 max-w-5xl">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-[#1F2933]">Your Progress</h1>
-            <p className="text-muted-foreground mt-1">Track your consistency, day by day.</p>
+        <section className="mb-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+              <h1 className="text-4xl font-bold text-[#1F2933] tracking-tight">
+                Hello, {user?.firstName || "there"}
+              </h1>
+              <p className="text-muted-foreground mt-2 text-lg">
+                Your consistency journey is looking great.
+              </p>
+            </div>
+            <CreateGoalDialog />
           </div>
-          <CreateGoalDialog />
-        </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+            <div className="bg-white p-4 rounded-2xl border border-black/[0.03] shadow-sm">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Active Goals</p>
+              <p className="text-2xl font-bold mt-1">{goals?.length || 0}</p>
+            </div>
+            <div className="bg-white p-4 rounded-2xl border border-black/[0.03] shadow-sm">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Consistency</p>
+              <p className="text-2xl font-bold mt-1">High</p>
+            </div>
+            <div className="bg-white p-4 rounded-2xl border border-black/[0.03] shadow-sm">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Effort</p>
+              <p className="text-2xl font-bold mt-1">
+                {goals?.reduce((acc, g) => acc + (g.logs?.length || 0), 0) || 0}
+              </p>
+            </div>
+            <div className="bg-white p-4 rounded-2xl border border-black/[0.03] shadow-sm">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Streak</p>
+              <p className="text-2xl font-bold mt-1">7 Days</p>
+            </div>
+          </div>
+        </section>
 
         {!hasGoals ? (
           <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-gray-200">
@@ -69,7 +96,7 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
-            {goals.map((goal) => (
+            {(goals || []).map((goal) => (
               <GoalCard key={goal.id} goal={goal as any} />
             ))}
           </div>
