@@ -3,6 +3,7 @@ import { Log } from "@shared/schema";
 import { format, subDays, eachDayOfInterval, isSameDay, startOfToday, getDay } from "date-fns";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 interface HeatmapProps {
   logs: Log[];
@@ -95,7 +96,14 @@ export function Heatmap({ logs, startDate: customStartDate, endDate: customEndDa
             return (
               <Tooltip key={dateStr}>
                 <TooltipTrigger asChild>
-                  <div 
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ 
+                      delay: weekIndex * 0.02 + dayIndex * 0.005,
+                      duration: 0.2,
+                      ease: "easeOut"
+                    }}
                     className={cn(
                       "w-3 h-3 rounded-[3px] transition-all duration-300 cursor-default border border-black/[0.03]", 
                       getColor(effort),
