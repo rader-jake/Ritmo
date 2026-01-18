@@ -87,8 +87,18 @@ export default function GoalDetails() {
                 {format(new Date(goal.startDate), "MMM d")}
               </p>
             </div>
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-black/5">
-              <p className="text-sm text-muted-foreground uppercase tracking-wide font-medium">Ends</p>
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-black/5 relative group">
+              <div className="flex justify-between items-start">
+                <p className="text-sm text-muted-foreground uppercase tracking-wide font-medium">Ends</p>
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <input
+                    type="date"
+                    className="text-[10px] border border-black/10 rounded px-1 py-0.5 focus:ring-1 focus:ring-primary outline-none"
+                    onChange={(e) => updateGoal.mutate({ id, endDate: e.target.value || null })}
+                    defaultValue={goal.endDate || ""}
+                  />
+                </div>
+              </div>
               <p className="text-3xl font-bold mt-2 text-[#1F2933]">
                 {goal.endDate ? format(new Date(goal.endDate), "MMM d") : "None"}
               </p>
