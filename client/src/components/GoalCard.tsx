@@ -1,56 +1,42 @@
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 import { GoalWithLogs } from "@shared/schema";
 import { Heatmap } from "./Heatmap";
 import { EffortLogger } from "./EffortLogger";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Flame } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Flame } from "lucide-react";
 
 interface GoalCardProps {
   goal: GoalWithLogs;
 }
 
 export function GoalCard({ goal }: GoalCardProps) {
-  // Calculate current streak
-  // This is a simplified streak calculation.
-  // In a real app, you'd iterate backwards from today checking consecutive days with effort > 0
+  const [, setLocation] = useLocation();
   const logs = goal.logs || [];
-  
-  // Sort logs by date descending
-  const sortedLogs = [...logs].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  
-  // Very basic "active days" count
   const totalActiveDays = logs.filter(l => l.effort > 0).length;
 
   return (
-    <Card className="glass-card hover:shadow-md transition-shadow duration-300">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-lg font-semibold text-foreground">
-          {goal.title}
-        </CardTitle>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center text-xs font-medium text-muted-foreground gap-1">
-            <Flame className="h-4 w-4 text-orange-500 fill-orange-500" />
-            {totalActiveDays} days
+    <Card 
+      className="glass-card hover:shadow-md transition-all duration-300 cursor-pointer group active:scale-[0.99] overflow-hidden"
+      onClick={() => setLocation(`/goals/${goal.id}`)}
+    >
+      <CardContent className="p-4 sm:p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">
+            {goal.title}
+          </h3>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center text-xs font-medium text-muted-foreground gap-1 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100">
+              <Flame className="h-3 w-3 text-orange-500 fill-orange-500" />
+              <span className="text-orange-700">{totalActiveDays}</span>
+            </div>
+            <div onClick={(e) => e.stopPropagation()}>
+              <EffortLogger goalId={goal.id} />
+            </div>
           </div>
-          <EffortLogger goalId={goal.id} />
         </div>
-      </CardHeader>
-      <CardContent>
-        {goal.description && (
-          <p className="text-sm text-muted-foreground mb-4 line-clamp-1">{goal.description}</p>
-        )}
         
-        <div className="mt-2">
+        <div className="relative">
           <Heatmap logs={logs} startDate={goal.startDate} className="mask-gradient-right" />
-        </div>
-
-        <div className="flex justify-end mt-4">
-          <Link href={`/goals/${goal.id}`}>
-            <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 hover:bg-primary/5 -mr-2">
-              View Details <ArrowRight className="ml-1 h-3 w-3" />
-            </Button>
-          </Link>
         </div>
       </CardContent>
     </Card>

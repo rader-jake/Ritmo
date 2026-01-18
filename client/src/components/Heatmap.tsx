@@ -89,8 +89,9 @@ export function Heatmap({ logs, startDate: customStartDate, className }: Heatmap
                 <TooltipTrigger asChild>
                   <div 
                     className={cn(
-                      "w-3 h-3 rounded-[2px] transition-colors cursor-default", 
-                      getColor(effort)
+                      "w-3 h-3 rounded-[3px] transition-all duration-300 cursor-default border border-black/[0.03]", 
+                      getColor(effort),
+                      effort > 0 && "shadow-[inset_0_-1px_0_rgba(0,0,0,0.1)] hover:scale-110"
                     )} 
                   />
                 </TooltipTrigger>

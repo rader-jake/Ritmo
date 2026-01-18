@@ -68,7 +68,7 @@ export default function Dashboard() {
             <CreateGoalDialog />
           </div>
         ) : (
-          <div className="grid gap-6">
+          <div className="grid gap-4 sm:grid-cols-2">
             {goals.map((goal) => (
               <GoalCard key={goal.id} goal={goal} />
             ))}
