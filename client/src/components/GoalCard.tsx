@@ -42,7 +42,7 @@ export function GoalCard({ goal }: GoalCardProps) {
         )}
         
         <div className="mt-2">
-          <Heatmap logs={logs} days={200} className="mask-gradient-right" />
+          <Heatmap logs={logs} startDate={goal.startDate} className="mask-gradient-right" />
         </div>
 
         <div className="flex justify-end mt-4">

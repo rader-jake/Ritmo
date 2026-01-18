@@ -6,13 +6,20 @@ import { cn } from "@/lib/utils";
 
 interface HeatmapProps {
   logs: Log[];
-  days?: number;
+  startDate?: string | Date;
   className?: string;
 }
 
-export function Heatmap({ logs, days = 365, className }: HeatmapProps) {
+export function Heatmap({ logs, startDate: customStartDate, className }: HeatmapProps) {
   const today = startOfToday();
-  const startDate = subDays(today, days);
+  const startDate = useMemo(() => {
+    if (customStartDate) {
+      const date = new Date(customStartDate);
+      // Ensure we don't start in the future or something weird
+      return date > today ? today : date;
+    }
+    return subDays(today, 365);
+  }, [customStartDate, today]);
   
   // Generate all dates in the range
   const dates = useMemo(() => {

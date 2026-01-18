@@ -105,7 +105,7 @@ export default function GoalDetails() {
             </div>
             
             <div className="w-full overflow-x-auto pb-4">
-              <Heatmap logs={goal.logs || []} days={365} className="min-w-[600px]" />
+              <Heatmap logs={goal.logs || []} startDate={goal.startDate} className="min-w-[600px]" />
             </div>
 
             <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground justify-end">
