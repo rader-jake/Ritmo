@@ -93,6 +93,10 @@ export function Heatmap({ logs, startDate: customStartDate, endDate: customEndDa
             const dateStr = format(date, "yyyy-MM-dd");
             const effort = logsMap.get(dateStr) || 0;
             
+            // Calculate a global index for a true one-by-one sequential animation
+            // weekIndex * 7 + dayIndex gives us the position in the chronological flow
+            const globalIndex = weekIndex * 7 + dayIndex;
+            
             return (
               <Tooltip key={dateStr}>
                 <TooltipTrigger asChild>
@@ -100,8 +104,8 @@ export function Heatmap({ logs, startDate: customStartDate, endDate: customEndDa
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ 
-                      delay: weekIndex * 0.02 + dayIndex * 0.005,
-                      duration: 0.2,
+                      delay: globalIndex * 0.008, // Adjust this multiplier to control the speed (0.008 is slower than before)
+                      duration: 0.15,
                       ease: "easeOut"
                     }}
                     className={cn(
