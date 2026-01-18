@@ -2,11 +2,22 @@ import { useAuth } from "@/hooks/use-auth";
 import { useGoals } from "@/hooks/use-goals";
 import { CreateGoalDialog } from "@/components/CreateGoalDialog";
 import { GoalCard } from "@/components/GoalCard";
-import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Loader2, LogOut } from "lucide-react";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const { data: goals, isLoading, error } = useGoals();
+
+  const handleLogout = () => {
+    window.location.href = "/api/logout";
+  };
 
   if (isLoading) {
     return (
@@ -40,9 +51,23 @@ export default function Dashboard() {
             <span className="font-semibold text-lg tracking-tight">Ritmo</span>
           </div>
           <div className="flex items-center gap-4">
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium text-sm">
-              {user?.firstName?.[0] || "U"}
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium text-sm hover:bg-primary/20 transition-colors cursor-pointer">
+                  {user?.firstName?.[0] || "U"}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <div className="px-2 py-1.5">
+                  <p className="text-sm font-medium text-[#1F2933]">{user?.email}</p>
+                  <p className="text-xs text-muted-foreground">{user?.firstName} {user?.lastName}</p>
+                </div>
+                <DropdownMenuItem onClick={handleLogout} className="text-destructive cursor-pointer">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>

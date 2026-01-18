@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { Heatmap } from "@/components/Heatmap";
 
 export default function Landing() {
@@ -22,7 +22,7 @@ export default function Landing() {
             </div>
             <span className="font-bold text-xl tracking-tight text-[#1F2933]">Ritmo</span>
           </div>
-          <a href="/api/login">
+          <a href="/login">
             <Button variant="ghost" className="font-medium text-[#1F2933] hover:bg-black/5">
               Log in
             </Button>
@@ -43,9 +43,9 @@ export default function Landing() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <a href="/api/login">
+            <a href="/login">
               <Button size="lg" className="h-12 px-8 text-base bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/25 transition-all hover:scale-105">
-                Start Tracking Free
+                Start Tracking
               </Button>
             </a>
           </div>
