@@ -115,7 +115,10 @@ export function Heatmap({ logs, startDate: customStartDate, endDate: customEndDa
                     )} 
                   />
                 </TooltipTrigger>
-                <TooltipContent side="top" className="text-xs">
+                <TooltipContent 
+                  side="top" 
+                  className="text-xs bg-white dark:bg-slate-900 shadow-xl border border-black/10 opacity-100 z-[1000] p-2 min-w-[120px]"
+                >
                   <p className="font-medium">{format(date, "MMM d, yyyy")}</p>
                   <p className="text-muted-foreground">Effort: {effort}/5</p>
                 </TooltipContent>
