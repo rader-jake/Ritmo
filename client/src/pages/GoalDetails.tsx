@@ -88,9 +88,9 @@ export default function GoalDetails() {
               </p>
             </div>
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-black/5">
-              <p className="text-sm text-muted-foreground uppercase tracking-wide font-medium">Status</p>
-              <p className={cn("text-3xl font-bold mt-2", goal.archived ? "text-muted-foreground" : "text-primary")}>
-                {goal.archived ? "Archived" : "Active"}
+              <p className="text-sm text-muted-foreground uppercase tracking-wide font-medium">Ends</p>
+              <p className="text-3xl font-bold mt-2 text-[#1F2933]">
+                {goal.endDate ? format(new Date(goal.endDate), "MMM d") : "None"}
               </p>
             </div>
           </section>
@@ -105,7 +105,7 @@ export default function GoalDetails() {
             </div>
             
             <div className="w-full overflow-x-auto pb-4">
-              <Heatmap logs={goal.logs || []} startDate={goal.startDate} className="min-w-[600px]" />
+              <Heatmap logs={goal.logs || []} startDate={goal.startDate} endDate={goal.endDate} className="min-w-[600px]" />
             </div>
 
             <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground justify-end">

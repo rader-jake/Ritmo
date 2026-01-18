@@ -12,11 +12,14 @@ import { useCreateGoal } from "@/hooks/use-goals";
 import { Loader2, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+import { format } from "date-fns";
+
 // Extend schema for form validation if needed, or use directly
 const formSchema = insertGoalSchema.pick({
   title: true,
   description: true,
   color: true,
+  endDate: true,
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -32,6 +35,7 @@ export function CreateGoalDialog() {
       title: "",
       description: "",
       color: "#0F766E",
+      endDate: "",
     },
   });
 
@@ -39,7 +43,8 @@ export function CreateGoalDialog() {
     try {
       await createGoal.mutateAsync({
         ...data,
-        startDate: new Date().toISOString().split('T')[0], // Today YYYY-MM-DD
+        startDate: format(new Date(), "yyyy-MM-dd"), // Today YYYY-MM-DD
+        endDate: data.endDate || null,
       });
       toast({ title: "Goal created successfully!" });
       setOpen(false);
@@ -95,6 +100,20 @@ export function CreateGoalDialog() {
                       {...field}
                       value={field.value || ""} 
                     />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="endDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>End Date (Optional)</FormLabel>
+                  <FormControl>
+                    <Input type="date" {...field} value={field.value || ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

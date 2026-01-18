@@ -7,10 +7,11 @@ import { cn } from "@/lib/utils";
 interface HeatmapProps {
   logs: Log[];
   startDate?: string | Date;
+  endDate?: string | Date | null;
   className?: string;
 }
 
-export function Heatmap({ logs, startDate: customStartDate, className }: HeatmapProps) {
+export function Heatmap({ logs, startDate: customStartDate, endDate: customEndDate, className }: HeatmapProps) {
   const today = startOfToday();
   const startDate = useMemo(() => {
     if (customStartDate) {
@@ -20,11 +21,18 @@ export function Heatmap({ logs, startDate: customStartDate, className }: Heatmap
     }
     return subDays(today, 365);
   }, [customStartDate, today]);
+
+  const endDate = useMemo(() => {
+    if (customEndDate) {
+      return new Date(customEndDate);
+    }
+    return today;
+  }, [customEndDate, today]);
   
   // Generate all dates in the range
   const dates = useMemo(() => {
-    return eachDayOfInterval({ start: startDate, end: today });
-  }, [startDate, today]);
+    return eachDayOfInterval({ start: startDate, end: endDate });
+  }, [startDate, endDate]);
 
   // Create a map for fast lookup
   const logsMap = useMemo(() => {

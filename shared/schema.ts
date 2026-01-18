@@ -41,7 +41,9 @@ export const logsRelations = relations(logs, ({ one }) => ({
 }));
 
 // Schemas
-export const insertGoalSchema = createInsertSchema(goals).omit({ id: true, userId: true, createdAt: true, archived: true });
+export const insertGoalSchema = createInsertSchema(goals).omit({ id: true, userId: true, createdAt: true, archived: true }).extend({
+  endDate: z.string().optional().nullable(),
+});
 export const insertLogSchema = createInsertSchema(logs).omit({ id: true, createdAt: true });
 
 // Types
