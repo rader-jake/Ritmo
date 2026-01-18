@@ -73,53 +73,6 @@ export async function setupAuth(app: Express) {
   passport.serializeUser((user: Express.User, cb) => cb(null, user));
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
-  // Database-based login route
-  app.post("/api/login", async (req, res, next) => {
-    try {
-      const { email, password } = req.body;
-
-      if (!email || !password) {
-        return res.status(400).json({ message: "Email and password required" });
-      }
-
-      // Look up user by email
-      const user = await authStorage.getUserByEmail(email);
-      if (!user) {
-        return res.status(401).json({ message: "Invalid email or password" });
-      }
-
-      // Validate password
-      const isPasswordValid = await authStorage.validatePassword(user, password);
-      if (!isPasswordValid) {
-        return res.status(401).json({ message: "Invalid email or password" });
-      }
-
-      // Create session user object
-      const sessionUser: any = {
-        id: user.id,
-        claims: {
-          sub: user.id,
-          email: user.email,
-          first_name: user.firstName,
-          last_name: user.lastName,
-        },
-        access_token: "session-token",
-        refresh_token: "session-refresh",
-        expires_at: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60,
-      };
-
-      req.logIn(sessionUser, (err) => {
-        if (err) {
-          return res.status(500).json({ message: "Failed to create session" });
-        }
-        res.json({ message: "Login successful" });
-      });
-    } catch (error) {
-      console.error("Login error:", error);
-      res.status(500).json({ message: "Login failed" });
-    }
-  });
-
   // Logout route
   app.get("/api/logout", (req, res) => {
     req.logout(() => {
@@ -129,27 +82,7 @@ export async function setupAuth(app: Express) {
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
-  const user = req.user as any;
-
   if (!req.isAuthenticated()) {
     return res.status(401).json({ message: "Unauthorized" });
   }
-
-  // Check token expiration
-  if (!user?.expires_at) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  const now = Math.floor(Date.now() / 1000);
-  if (now <= user.expires_at) {
-    return next();
-  }
-
-  const refreshToken = user.refresh_token;
-  if (!refreshToken) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  // Token is expired and no refresh token - need to re-login
-  return res.status(401).json({ message: "Session expired. Please login again." });
-};
+  return next();

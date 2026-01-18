@@ -17,43 +17,7 @@ export async function registerRoutes(
 
   app.get(api.goals.list.path, isAuthenticated, async (req: any, res) => {
     const userId = req.user.claims.sub;
-    let goals = await storage.getGoals(userId);
-
-    // Auto-seed for new users
-    if (goals.length === 0) {
-      const today = new Date();
-      const startOfYear = new Date(today.getFullYear(), 0, 1);
-      
-      const demoGoal = await storage.createGoal({
-        title: "Daily Walk",
-        description: "Take a 15 minute walk every day to clear the mind.",
-        color: "#0F766E",
-        startDate: startOfYear.toISOString().split('T')[0],
-        userId: userId,
-        archived: false,
-      });
-
-      // Add some logs for the demo goal to show the heatmap
-      const logsToInsert = [];
-      for (let i = 0; i < 30; i++) {
-         const date = new Date(today);
-         date.setDate(date.getDate() - i);
-         // Random effort 0-4
-         const effort = Math.floor(Math.random() * 5);
-         if (effort > 0) {
-           await storage.createLog({
-             goalId: demoGoal.id,
-             date: date.toISOString().split('T')[0],
-             effort: effort,
-             note: "Walked around the block"
-           });
-         }
-      }
-      
-      // Re-fetch to get the goal (logs are fetched separately usually, but goals list is just goals)
-      goals = await storage.getGoals(userId);
-    }
-
+    const goals = await storage.getGoals(userId);
     res.json(goals);
   });
 

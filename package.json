@@ -12,6 +12,7 @@
     "db:migrate": "tsx server/migrate.ts"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.1.4",
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
