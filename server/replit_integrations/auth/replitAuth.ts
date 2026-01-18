@@ -29,9 +29,14 @@ export function getSession() {
   });
   
   const isLocalDev = process.env.NODE_ENV === "development";
+  const secret = process.env.SESSION_SECRET;
+  
+  if (!secret) {
+    throw new Error("SESSION_SECRET environment variable is not set. Please check your .env file.");
+  }
   
   return session({
-    secret: process.env.SESSION_SECRET!,
+    secret,
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
